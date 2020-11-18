@@ -1,0 +1,59 @@
+logging:
+  level:
+    com: debug
+    org:
+      springframework:
+        security: debug
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
+com:
+  richards275:
+    wareneingang:
+      jwtSecret: RichardsSecretKey
+      jwtExpirationMs: 86400000
+my:
+  testingemail: ${TESTING_MAIL_ADDRESS}
+  wrongenvironmentvariable: ${WRONG_ENVIRONMENT_VARIABLE}
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PW}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: default
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      write-date-timestamps-as-nanoseconds: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wareneingang?useLegacyDatetimeCode=false&serverTimezone=UTC
+    username: ${POSTGRES_ADMIN_NAME}
+    password: ${POSTGRES_ADMIN_PW}
+    platform: postgres
+    initialization-mode: always
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        show-sql: true
+        format_sql: true
