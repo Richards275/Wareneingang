@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-card>
-      <v-form @submit.prevent="login" data-test="form">
+      <v-form data-test="form" @submit.prevent="login">
         <v-card-title>
           <h2>Login/Logout</h2>
         </v-card-title>

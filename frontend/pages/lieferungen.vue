@@ -6,8 +6,8 @@
         color="accent"
         dark
         class="ml-2"
-        @click="getData"
         data-test="Aktualisiere"
+        @click="getData"
       >
         Aktualisiere
       </v-chip>

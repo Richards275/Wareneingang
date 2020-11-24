@@ -52,10 +52,6 @@ import Quagga from 'quagga'
 export default {
   name: 'Video',
   props: {},
-  mounted() {
-    this.initializeMedia(this.$refs.player)
-    this.errorMsg = ''
-  },
   data() {
     return {
       isSnapshot: false,
@@ -64,6 +60,10 @@ export default {
     }
   },
   computed: {},
+  mounted() {
+    this.initializeMedia(this.$refs.player)
+    this.errorMsg = ''
+  },
   methods: {
     async scannerAnswer(code) {
       await this.stopVideo(this.$refs.player)
