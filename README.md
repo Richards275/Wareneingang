@@ -31,7 +31,7 @@ Passwortänderungen werden mit einer E-Mail an die User*innen bestätigt.
 
 ### Datenbank
 Legen Sie in PostgreSQL eine Datenbank "wareneingang" an. 
-JPA wird die Tabellen automatisch erzeugen.
+Hibernate wird die Tabellen automatisch erzeugen.
 
 Führen Sie das Skript create.sql aus. 
 Dieses legt Rollen, den Weltladen als Lieferanten und eine*n 
@@ -55,20 +55,18 @@ Alle ausgehenden E-Mails werden an diese E-Mail-Adresse weitergeleitet.
 Dies ist am Anfang erforderlich und später für Testzwecke sehr hilfreich.
 
 ### Starten des Programmes    
-- im Unterordner /frontend
+Starten Sie das Backend in IntelliJ oder mit
 
+    mvn spring-boot:run
+und das Frontend im Unterordner /frontend durch 
 
       npm install
       npm run dev  
-- Starten Sie das Backend in IntelliJ
-- das Frontend ist nun erreichbar unter
-
+Das Frontend ist nun erreichbar unter
 
     http://localhost:3000/
 
-
-## Kennenlernen der Funktionalität 
-#### Bitte verwenden Sie den Google Chrome Browser, da experimentelle Features verwendet werden
+## Kennenlernen der Funktionalität
 - Geben sie im Menüpunkt Login/Logout im Feld Username oder Email ein: admin@admin.de und
 klicken Sie auf "Neues Passwort".
 - Sie erhalten eine auf die hinterlegte "TESTING_MAIL_ADDRESS" umgeleitete Email mit Zugangsdaten. 
@@ -106,9 +104,42 @@ Frontend: im Ordner /frontend
 
     npm run build
     npm run test (ggf. zweimal)
-Backend: IntelliJ oder
+Backend: IntelliJ oder nur Unit tests mit 
 
     mvn test
-Frontend und Backend
+
+### Deployment mit Docker
+Erzeugen Sie ein jar im Unterverzeichnis /target mittels
+
+    mvn clean install 
+Führen Sie im root Verzeichnis aus 
+
+    docker-compose up -d
+Prüfen Sie den Start des Frontends und Backends ggf. mit 
+
+    docker-compose logs -f
+Sie verlassen die Anzeige mit STRG +c.
+
+Gehen Sie in den database container mit
+
+    docker exec -it database bash  
+Geben Sie dort ein
+
+    psql wareneingang admin
+Die von Hibernate angelegten Tabellen werden Ihnen angezeigt mit
+
+    \dt
+Kopieren Sie den Inhalt von create.sql hinein am Prompt.
+
+Verlassen Sie den Container mit
+
+    \q
+    exit
+Sie erreichen die Anwendung unter  
+
+    http://localhost:3000/
+
+### JAR mit Frontend und Backend
+Kommentieren Sie den auskommentierten Teil ein in pom.xml und führen Sie aus 
 
     mvn clean install (ggf. zweimal)

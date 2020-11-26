@@ -49,7 +49,7 @@ export default {
 
   proxy: {
     '/api/': {
-      target: 'http://localhost:8080',
+      target: process.env.PROXY_API || 'http://localhost:8080',
       pathRewrite: { '^/api/': '' },
       changeOrigin: true,
     }
