@@ -67,6 +67,7 @@ Das Frontend ist nun erreichbar unter
     http://localhost:3000/
 
 ## Kennenlernen der Funktionalität
+#### Bitte verwenden Sie den Google Chrome Browser, da experimentelle Features verwendet werden
 - Geben sie im Menüpunkt Login/Logout im Feld Username oder Email ein: admin@admin.de und
 klicken Sie auf "Neues Passwort".
 - Sie erhalten eine auf die hinterlegte "TESTING_MAIL_ADDRESS" umgeleitete Email mit Zugangsdaten. 
