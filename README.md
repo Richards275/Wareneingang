@@ -144,3 +144,109 @@ Sie erreichen die Anwendung unter
 Kommentieren Sie den auskommentierten Teil ein in pom.xml und führen Sie aus 
 
     mvn clean install (ggf. zweimal)
+
+### Continuous Integration: Setup
+Dies ist eine Anleitung für Docker unter Windows 10. Mit macOS oder Linux
+verläuft die Installation ähnlich.
+ 
+Starten sie den Jenkins Container und den Git Server Container mittels
+
+    docker-compose -f docker-compose_jenkins.yml up
+Bitte beachten Sie die Hardware-Requirements: 
+https://docs.gitlab.com/ee/install/requirements.html#hardware-requirements
+
+Sie erreichen Jenkins im Browser unter 
+
+    http://localhost:8081/
+Hinterlegen sie in C:\Windows\System32\drivers\etc\hosts 
+
+     127.0.0.1 gitlab.example.com
+Damit erreichen sie den Git Server im Browser unter 
+
+     gitlab.example.com:8090
+#### Git Server einrichten und pushen des Codes 
+Erstellen Sie im Git Server eine neue Gruppe "jenkins" 
+und ein neues Projekt "wareneingang". 
+
+Erstellen Sie eine Userin "besserewelt" mit Passwort "12345678".
+
+Fügen Sie dem Projekt wareneingang die Userin besserewelt mit der 
+Rolle Maintainer hinzu. 
+
+Führen Sie in einem Zielverzeichnis für Ihr Projekt aus
+    
+     git clone http://besserewelt:12345678@gitlab.example.com:8090/jenkins/wareneingang.git
+Kopieren Sie den Inhalt des Repositories https://github.com/Richards275/wareneingang
+in dieses Verzeichnis und führen Sie dort aus
+
+     git status
+     git add .
+     git status
+     git commit -m "Add files"
+     git push origin master
+Prüfen Sie im Repository des Git Servers, dass der Code vorliegt.
+
+#### Jenkins Job einrichten 
+Installieren Sie die Plugins "Strict Crumb Issuer", "Role-based Authorization Strategy",
+"Docker" und "Docker Pipeline".
+
+Wählen Sie unter Manage Jenkins -> Configure Global Security -> CSRF Protection 
+den "Strict Crumb Issuer" und entfernen Sie unter Advanced das Häkchen
+"Check the session ID."
+
+Erzeugen Sie die Userin "jenkins" mit Passwort "1234".
+
+Aktivieren Sie das zweite Plugin: Wählen Sie unter "configure global security" aus 
+"role-based strategy".
+
+Erstellen Sie eine Rolle "trigger-jobs" mit den Berechtigungen Overall Read, Job read, Job Build
+
+Geben Sie der Userin jenkins die Rolle trigger-jobs.
+
+Hinterlegen Sie unter global credentials die Git Server credentials:
+besserewelt, 12345678, id: git_user
+
+Legen Sie einen neuen Job "wareneingang" an und wählen Sie dabei "Pipeline".
+
+Kopieren Sie unter "Pipeline" nach Auswahl von "Pipeline Script" den Inhalt der Datei "Jenkinsfile" ein.
+
+#### Git Server custom hook einrichten
+Bei jedem push des Codes soll ein Build angestoßen werden. Führen Sie aus
+
+    docker exec -it git-server bash
+    cd /var/opt/gitlab/git-data/repositories/
+    grep -R wareneingang
+Wechseln Sie in das angegebene .git-Verzeichnis, der Befehl lautet in etwa
+
+    cd @hashed/d4/73/d4735e3a265e16eee03f59718b9b5d03019c07d8b11111111111.git/
+
+Testen Sie die Verbindung mit
+
+    curl -u "jenkins:1234" -s 'http://jenkins:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)'
+
+Der Crumb wird Ihnen angezeigt. Testen Sie das Triggern des Jobs mittels
+
+    	crumb=$(curl -u "jenkins:1234" -s 'http://jenkins:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)')
+    	curl -u "jenkins:1234" -H "$crumb" -X POST http://jenkins:8080/job/wareneingang/build?delay=0sec
+Prüfen Sie, ob automatisch in Jenkins der Job "wareneingang" losläuft.
+
+Hinterlegen Sie das auszuführende Script mittels 
+    
+    mkdir custom_hooks
+    cd custom_hooks
+    vi post-receive
+    paste Inhalt der Datei post-receive
+    chmod +x post-receive
+    cd ..
+    chown git:git custom_hooks/ -R
+
+Ergänzen Sie in der README.md Datei eine Zeile und führen Sie aus
+
+    git status
+    git add .
+    git commit -m "Test git hook trigger"
+    git push origin master
+
+Der Jenkins Job läuft an.
+
+Für einen Einsatz in Production müssen selbstverständlich weitere stages in der pipeline ergänzt werden. 

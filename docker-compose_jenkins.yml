@@ -1,0 +1,33 @@
+version: '3'
+services:
+  jenkins:
+    container_name: jenkins
+    user: root
+    build:
+      context: .
+      dockerfile: Dockerfile-Jenkins
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./docker/jenkins_home:/var/jenkins_home
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - net
+  git:
+    container_name: git-server
+    image: 'gitlab/gitlab-ee:latest'
+    hostname: 'gitlab.example.com'
+    ports:
+      - '8090:80'
+    volumes:
+      - '$GITLAB_HOME/config:/etc/gitlab'
+      - '$GITLAB_HOME/logs:/var/log/gitlab'
+      - '$GITLAB_HOME/data:/var/opt/gitlab'
+    networks:
+      - net
+networks:
+  net:
+# todo: für Docker in Windows 10 ist leider user:root erforderlich
+# https://stackoverflow.com/questions/59529203/jenkins-with-docker-compose-got-permission-denied-while-trying-to-connect-to-the
+# Unfortunately, when running containers such as Jenkins there’s no better alternative that I’ve found so far in Docker for Windows.
+# https://tomgregory.com/running-docker-in-docker-on-windows/
