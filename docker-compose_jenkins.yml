@@ -20,9 +20,9 @@ services:
     ports:
       - '8090:80'
     volumes:
-      - '$GITLAB_HOME/config:/etc/gitlab'
-      - '$GITLAB_HOME/logs:/var/log/gitlab'
-      - '$GITLAB_HOME/data:/var/opt/gitlab'
+      - ./docker/gitlab_home/config:/etc/gitlab
+      - ./docker/gitlab_home/logs:/var/log/gitlab
+      - ./docker/gitlab_home/data:/var/opt/gitlab
     networks:
       - net
 networks:
